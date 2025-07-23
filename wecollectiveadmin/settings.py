@@ -15,9 +15,13 @@ from dotenv import load_dotenv
 from urllib.parse import urlparse
 load_dotenv()
 url = urlparse(os.getenv("DATABASE_URL"))
+BUCKET_NAME = os.getenv("AWS_S3_BUCKET_NAME")
+REGION = os.getenv("AWS_DEFAULT_REGION")
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent
-
+print(f"ID: {os.getenv('AWS_ACCESS_KEY_ID')}")
+if not all([os.getenv("AWS_ACCESS_KEY_ID"), os.getenv("AWS_SECRET_ACCESS_KEY"), BUCKET_NAME]):
+    raise RuntimeError("One or more AWS environment vars are missing")
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -39,7 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_cryptography'
+    'django_cryptography',
+    'storages',
+    'images'
 ]
 
 MIDDLEWARE = [
@@ -127,3 +133,16 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Media files AWS S3 Bucket settings
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = BUCKET_NAME
+AWS_S3_REGION_NAME = 'us-east-1'
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+# Use S3 for default file storage (media uploads)
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'

@@ -8,6 +8,9 @@ django = "*"
 python-dotenv = "*"
 django-cryptography = "*"
 psycopg2-binary = "*"
+django-storages = "*"
+boto3 = "*"
+pillow = "*"
 
 [dev-packages]
 
