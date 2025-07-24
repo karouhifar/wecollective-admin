@@ -17,6 +17,7 @@ load_dotenv()
 url = urlparse(os.getenv("DATABASE_URL"))
 BUCKET_NAME = os.getenv("AWS_S3_BUCKET_NAME")
 REGION = os.getenv("AWS_DEFAULT_REGION")
+AWS_CLOUDFRONT_DOMAIN = os.getenv("AWS_CLOUDFRONT_DOMAIN")
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent
 print(f"ID: {os.getenv('AWS_ACCESS_KEY_ID')}")
@@ -45,7 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_cryptography',
     'storages',
-    'images'
+    'images',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
