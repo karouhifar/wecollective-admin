@@ -13,6 +13,12 @@ boto3 = "*"
 pillow = "*"
 djangorestframework = "*"
 awsebcli = "*"
+gunicorn = "*"
+whitenoise = "*"
+twilio = "*"
+django-otp = "*"
+django-otp-twilio = "*"
+pyotp = "*"
 
 [dev-packages]
 

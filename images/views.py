@@ -8,7 +8,6 @@ from images.utils.serializers import ImageMetadataSerializer
 @api_view(['GET'])
 def get_background_image(request):
     background_image = ImageUpload.objects.filter(status=True).first()
-    print("Fetching background image...", str(background_image))
     if not background_image:
         return Response(
             {"message": "No background image found"},
@@ -16,5 +15,4 @@ def get_background_image(request):
         )
 
     serializer = ImageMetadataSerializer(background_image)
-    print("Background image data:", serializer.data)
     return Response(serializer.data)

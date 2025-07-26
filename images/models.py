@@ -21,6 +21,7 @@ class ImageUpload(models.Model):
 
     def save(self, *args, **kwargs):
         if self.status:
+            print("Status is True, updating other products...", self.pk)
             # Get all other active products of the same module_type
             same_module_products = ImageUpload.objects.filter(
                 Q(status=True) &

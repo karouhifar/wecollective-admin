@@ -15,10 +15,18 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.shortcuts import render
 from django.urls import include, path
 admin.site.site_header = 'Mundus Axis Admin'
 admin.site.site_url = 'https://symphonious-torrone-91f462.netlify.app/'
+
+
+def hello_world(request):
+    return render(request, 'index.html')
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('images.urls')),
+    path('', hello_world, name='home'),
 ]

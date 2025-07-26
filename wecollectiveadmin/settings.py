@@ -30,9 +30,9 @@ if not all([os.getenv("AWS_ACCESS_KEY_ID"), os.getenv("AWS_SECRET_ACCESS_KEY"), 
 SECRET_KEY = 'django-insecure-^qhws6vr4t6@th!uc_bx1xpzw!o3g01t0!&kruylhmgv%5_*7w'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -47,7 +47,11 @@ INSTALLED_APPS = [
     'django_cryptography',
     'storages',
     'images',
-    'rest_framework'
+    'accounts',
+    'rest_framework',
+    'django_otp',
+    'django_otp.plugins.otp_totp',
+    'otp_twilio',
 ]
 
 MIDDLEWARE = [
@@ -56,8 +60,10 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'wecollectiveadmin.urls'
@@ -130,9 +136,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+
+OTP_TWILIO_ACCOUNT = os.getenv('TWILIO_ACCOUNT_SID')
+OTP_TWILIO_AUTH = os.getenv('TWILIO_AUTH_TOKEN')
+OTP_TWILIO_FROM = os.getenv('TWILIO_CALLER_ID')
+OTP_TWILIO_TOKEN_VALIDITY = 300
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
