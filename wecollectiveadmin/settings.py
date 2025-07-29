@@ -141,9 +141,9 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
-OTP_TWILIO_ACCOUNT = os.getenv('TWILIO_ACCOUNT_SID')
-OTP_TWILIO_AUTH = os.getenv('TWILIO_AUTH_TOKEN')
-OTP_TWILIO_FROM = os.getenv('TWILIO_CALLER_ID')
+TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
+OTP_TWILIO_FROM = os.getenv('TWILIO_PHONE_NUMBER')
 OTP_TWILIO_TOKEN_VALIDITY = 300
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
