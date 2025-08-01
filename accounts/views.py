@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login
 from django.shortcuts import redirect, render
 from django.contrib.auth import authenticate
+from django.contrib import messages
 import pyotp
 from accounts.models import UserProfile
 from twilio.rest import Client
@@ -38,7 +39,7 @@ def admin_login(request):
             except Exception as e:
                 print("Error sending SMS:", e)
                 error = 'Failed to send OTP. Please try again later.'
-                return render(request, 'admin_login.html', {'error': error})
+                return render(request, 'login.html', {'error': error})
 
             # Store partial-auth state in session
             request.session['pre_2fa_user_id'] = user.id
@@ -51,7 +52,7 @@ def admin_login(request):
             return redirect('admin_otp_verify')
         else:
             error = 'Invalid credentials or not authorized.'
-    return render(request, 'admin_login.html', {'error': error})
+    return render(request, 'admin/login.html', {'error': error})
 
 ###################################################################
 
@@ -60,16 +61,14 @@ def admin_otp_verify(request):
     error = None
     # Ensure the user passed the first step
     user_id = request.session.get('pre_2fa_user_id')
-    print("HI", user_id)
     if not user_id:
         return redirect('admin_login')  # no partial-auth state
     # Optional: enforce a timeout (e.g. 5 minutes)
     timestamp = request.session.get('pre_2fa_timestamp', 0)
-    print("HI 2", timestamp)
     if time.time() - timestamp > 300:  # 300 seconds = 5 minutes
         request.session.flush()
         error = 'Session expired—please log in again.'
-        return render(request, 'admin_login.html', {'error': error})
+        return render(request, 'login.html', {'error': error})
     if request.method == 'POST':
         code = request.POST.get('otp_code', '').strip()
         try:
@@ -78,7 +77,6 @@ def admin_otp_verify(request):
             return redirect('admin_login')
 
         # Verify the OTP code
-        print("User profile", user.profile.totp_secret)
         totp = pyotp.TOTP(user.profile.totp_secret)
         if totp.verify(code, valid_window=1):
             # OTP valid: perform full login
@@ -91,4 +89,41 @@ def admin_otp_verify(request):
         else:
             error = 'Invalid code, please try again.'
      # Render OTP form on GET or after failure
-    return render(request, 'admin_otp_verify.html', {'error': error})
+    return render(request, 'admin/otp.html', {'error': error})
+
+
+def admin_resend_otp(request):
+    # Ensure partial-auth state
+    user_id = request.session.get('pre_2fa_user_id')
+    if not user_id:
+        return redirect('admin_login')
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return redirect('admin_login')
+    last_sent = request.session.get('pre_2fa_last_sent', 0)
+    if time.time() - last_sent < 30:
+        messages.error(request, 'Please wait before requesting a new code.')
+    else:
+        # Generate and send a fresh TOTP code
+        totp = pyotp.TOTP(user.profile.totp_secret)
+        code = totp.now()
+        try:
+            client = Client(
+                settings.TWILIO_ACCOUNT_SID,
+                settings.TWILIO_AUTH_TOKEN
+            )
+            client.messages.create(
+                body=f"Your admin login code is: {code}",
+                from_=settings.OTP_TWILIO_FROM,
+                to=user.profile.phone_number
+            )
+            # Update timestamp
+            request.session['pre_2fa_last_sent'] = time.time()
+            messages.success(
+                request, 'A new code has been sent to your phone.')
+        except Exception as e:
+            messages.error(
+                request, 'Failed to resend code. Check Twilio credentials.')
+
+    return redirect('admin_otp_verify')

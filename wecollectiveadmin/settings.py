@@ -48,10 +48,7 @@ INSTALLED_APPS = [
     'storages',
     'images',
     'accounts',
-    'rest_framework',
-    'django_otp',
-    'django_otp.plugins.otp_totp',
-    'otp_twilio',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [

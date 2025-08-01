@@ -1,0 +1,49 @@
+{% extends "admin/base_site.html" %} {% load static i18n %} {% block title %}Two
+Factor Verification{% endblock %} {% block extrahead %} {{ block.super }}
+<!-- Tailwind via CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+{% endblock %} {% block content %}
+<div class="flex items-center justify-center min-h-[500px] p-4">
+  <div
+    id="content-main"
+    class="bg-white rounded-2xl shadow-xl p-8 max-w-2xl w-full text-center flex flex-col items-center space-y-4"
+  >
+    <h1>{% trans 'Mundus administration' %}</h1>
+
+    {% if messages %}
+    <ul class="messagelist">
+      {% for message in messages %}
+      <li class="{{ message.tags }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %} {% if error %}
+    <div class="errornote"><p>{{ error }}</p></div>
+    {% endif %}
+
+    <p>We've sent a 6‑digit code to your phone. Enter it below to continue.</p>
+    <form action="" method="post" id="otp-form">
+      {% csrf_token %}
+      <div class="form-row">
+        <label for="id_otp_code">{% trans 'Code:' %}</label>
+        <input
+          type="text"
+          name="otp_code"
+          id="id_otp_code"
+          maxlength="6"
+          pattern="\d{6}"
+          required
+          autofocus
+        />
+      </div>
+      <div class="submit-row">
+        <input type="submit" value="{% trans 'Verify' %}" />
+      </div>
+    </form>
+
+    <p class="actions">
+      <a href="{% url 'admin_resend_otp' %}">{% trans 'Resend code' %}</a> |
+      <a href="{% url 'admin_login' %}">{% trans 'Back to login' %}</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "admin/base_site.html" %} {% load static i18n %} {% block title %}Log
+in{% endblock %} {% block extrahead %} {{ block.super }}
+<!-- Tailwind via CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+{% endblock %}{% block content %}
+<div class="flex items-center justify-center min-h-[500px] p-4">
+  <div
+    id="content-main"
+    class="bg-white rounded-2xl shadow-xl p-8 max-w-2xl w-full text-center flex flex-col items-center space-y-4"
+  >
+    <h1>{% trans 'Mundus administration' %}</h1>
+    {% if error %}
+    <div class="errornote"><p>{{ error }}</p></div>
+    {% endif %}
+    <form action="" method="post" id="login-form">
+      {% csrf_token %}
+      <div class="form-row">
+        <label for="id_username">{% trans 'Username:' %}</label>
+        <input
+          type="text"
+          name="username"
+          id="id_username"
+          autofocus
+          required
+        />
+      </div>
+      <div class="form-row">
+        <label for="id_password">{% trans 'Password:' %}</label>
+        <input type="password" name="password" id="id_password" required />
+      </div>
+      <input type="hidden" name="next" value="{{ request.GET.next }}" />
+      <div class="submit-row">
+        <input type="submit" value="{% trans 'Log in' %}" />
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
